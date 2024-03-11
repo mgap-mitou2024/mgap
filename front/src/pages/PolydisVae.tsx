@@ -4,7 +4,9 @@ import * as formik from "formik";
 import * as yup from "yup";
 import axios from "axios";
 import { FormikProps } from "formik";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
+import { MuiFileInput } from "mui-file-input";
+import Typography from "@mui/material/Typography";
 
 interface FormValues {
   pitchFile: File | null;
@@ -51,6 +53,14 @@ const PolydisVae = () => {
     rhythmFile: null,
   };
 
+  const [file, setFile] = useState<File | null>();
+  const handleChangeFile = (
+    newFile: React.SetStateAction<File | null | undefined>
+  ) => {
+    setFile(newFile);
+    console.log(file);
+  };
+
   return (
     <div>
       <Header />
@@ -61,6 +71,32 @@ const PolydisVae = () => {
         論文情報: Wang et al., Learning interpretable representation for
         controllable polyphonic music generation, ISMIR 2020.
       </p>
+      <Typography variant='body1' component='h6' mt={1} gutterBottom>
+        ファイル選択
+      </Typography>
+      <MuiFileInput
+        value={file}
+        onChange={handleChangeFile}
+        variant='outlined'
+      />
+      <br />
+      <Typography variant='caption' component='div' gutterBottom>
+        MP3/MP4/WAV ファイルのみ、ファイルサイズは5MB以内。
+      </Typography>
+      {file &&
+        !(
+          file.type === "audio/mpeg" ||
+          file.type === "video/mp4" ||
+          file.type === "audio/wav"
+        ) && (
+          <Typography
+            variant='caption'
+            component='div'
+            color='error.main'
+            gutterBottom>
+            このファイルタイプはサポートしていません。
+          </Typography>
+        )}
       <Formik
         validationSchema={schema}
         onSubmit={handleSubmit}
