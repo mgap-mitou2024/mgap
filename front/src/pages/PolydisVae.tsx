@@ -102,6 +102,7 @@ const PolydisVaeForm = () => {
         論文情報: Wang et al., Learning interpretable representation for
         controllable polyphonic music generation, ISMIR 2020.
       </p>
+      <h2>2つの楽曲の混合</h2>
       <Formik
         onSubmit={handleSubmit}
         initialValues={initialValues}
