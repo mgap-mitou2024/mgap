@@ -4,7 +4,7 @@ import * as formik from "formik";
 import * as yup from "yup";
 import axios from "axios";
 import { FormikProps } from "formik";
-import React, { useState } from "react";
+import React, { useState, createContext, useContext } from "react";
 import { MuiFileInput } from "mui-file-input";
 import Typography from "@mui/material/Typography";
 
@@ -13,12 +13,28 @@ interface FormValues {
   txt: File | null;
 }
 
+const AudioContext = createContext<React.Dispatch<React.SetStateAction<string | null>> | undefined>(undefined);
+
 const PolydisVae = () => {
+  const [audioSrc, setAudioSrc] = useState<string | null>(null);
+
+  return (
+    <AudioContext.Provider value={setAudioSrc}>
+      <div>
+        <PolydisVaeForm />
+        {audioSrc && <audio src={audioSrc} controls autoPlay />}
+      </div>
+    </AudioContext.Provider>
+  );
+};
+
+const PolydisVaeForm = () => {
   const { Formik } = formik;
   const schema = yup.object().shape({
     chd: yup.mixed().required(),
     txt: yup.mixed().required(),
   });
+  const setAudioSrc = useContext(AudioContext);
 
   const handleSubmit = async (values: FormValues, actions: any) => {
     console.log(typeof values.chd);
@@ -37,10 +53,16 @@ const PolydisVae = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+          responseType: "blob",
+        },
       );
 
       console.log("Success:", response.data);
+
+      // BlobからURLを生成
+      const audioUrl = URL.createObjectURL(response.data);
+      // 状態更新関数を用いて親コンポーネントまたは適切な状態管理場所にURLをセット
+      setAudioSrc && setAudioSrc(audioUrl);
     } catch (error) {
       console.error("Error:", error);
     } finally {
