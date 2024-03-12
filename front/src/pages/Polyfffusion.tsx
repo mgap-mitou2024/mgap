@@ -16,37 +16,119 @@ const validationSchema = yup.object().shape({
   acc: yup.mixed().required('伴奏 is required'),
 });
 const AudioContext1 = createContext<React.Dispatch<React.SetStateAction<string | null>> | undefined>(undefined);
+const AudioContext2 = createContext<React.Dispatch<React.SetStateAction<string | null>> | undefined>(undefined);
 
 const Polyffusion = () => {
   const [audioSrc1, setAudioSrc1] = useState<string | null>(null);
+  const [audioSrc2, setAudioSrc2] = useState<string | null>(null);
 
   return (
     <div>
       <Header />
       <h1>Polyffusion</h1>
       <p>
-        画像生成で話題になったDiffusionモデルを音楽に適用したAIで、多様な曲を作ります。
+        画像生成で話題になったDiffusionモデルを音楽に適用したAIで、多様な曲を作ります。生成には20〜30秒程度かかります。
           <br />
         論文情報: Min et al., Polyffusion: A Diffusion Model for Polyphonic Score Generation with Internal and External Controls, ISMIR 2023.
       </p>
       <AudioContext1.Provider value={setAudioSrc1}>
         <div>
-          <h2>伴奏に対するメロディー生成</h2>
+          <h2>ランダム生成</h2>
           <PolyffusionForm1 />
           {audioSrc1 && <audio src={audioSrc1} controls/>}
         </div>
       </AudioContext1.Provider>
+      <br />
+      <AudioContext2.Provider value={setAudioSrc2}>
+        <div>
+          <h2>伴奏に対するメロディー生成</h2>
+          <PolyffusionForm2 />
+          {audioSrc2 && <audio src={audioSrc2} controls/>}
+        </div>
+      </AudioContext2.Provider>
     </div>
   );
 };
 
 const PolyffusionForm1 = () => {
   const { Formik } = formik;
-  const schema = yup.object().shape({
-    chd: yup.mixed().required(),
-    txt: yup.mixed().required(),
-  });
   const setAudioSrc = useContext(AudioContext1);
+
+  const [isPosting, setIsPosting] = useState(false);
+  const [isError, setIsError] = useState(false);
+
+  const handleSubmit = async (values: FormValues, actions: any) => {
+    console.log(typeof values.acc);
+    setIsPosting(true);
+    try {
+      const formData = new FormData();
+
+      console.log(formData, typeof formData);
+
+      const response = await axios.post(
+        "https://mgap-demo-api.sawapipipi.mydns.jp/generate/polyffusion/random",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          responseType: "blob",
+        },
+      );
+
+      console.log("Success:", response.data);
+
+      // BlobからURLを生成
+      const audioUrl = URL.createObjectURL(response.data);
+      // 状態更新関数を用いて親コンポーネントまたは適切な状態管理場所にURLをセット
+      setAudioSrc && setAudioSrc(audioUrl);
+    } catch (error) {
+      console.error("Error:", error);
+      setIsError(true);
+    } finally {
+      setIsPosting(false);
+      actions.setSubmitting(false);
+    }
+  };
+
+  const initialValues: FormValues = {
+    acc: null,
+  };
+
+  const [file, setFile] = useState<File | null>();
+  const handleChangeFile = (
+    newFile: React.SetStateAction<File | null | undefined>
+  ) => {
+    setFile(newFile);
+    console.log(file);
+  };
+
+  return (
+    <div>
+      <Formik
+        onSubmit={handleSubmit}
+        initialValues={initialValues}
+        >
+        {({
+          handleSubmit,
+          handleChange,
+          setFieldValue,
+          values,
+          errors,
+        }: FormikProps<FormValues>) => (
+          <Form noValidate onSubmit={handleSubmit}>
+            <Button type='submit' disabled={isPosting}>{!isPosting ? "曲を作成" : "生成中"}</Button>
+            {isError && <ErrorMsg />}
+          </Form>
+        )}
+      </Formik>
+    </div>
+  );
+};
+
+const PolyffusionForm2 = () => {
+  const { Formik } = formik;
+  const setAudioSrc = useContext(AudioContext2);
 
   const [isPosting, setIsPosting] = useState(false);
   const [isError, setIsError] = useState(false);
