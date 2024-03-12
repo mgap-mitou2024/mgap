@@ -12,7 +12,10 @@ interface FormValues {
   chd: File | null;
   txt: File | null;
 }
-
+const validationSchema = yup.object().shape({
+  chd: yup.mixed().required('音高参照ファイル is required'),
+  txt: yup.mixed().required('リズム参照ファイル is required'),
+});
 const AudioContext = createContext<React.Dispatch<React.SetStateAction<string | null>> | undefined>(undefined);
 
 const PolydisVae = () => {
@@ -98,7 +101,8 @@ const PolydisVaeForm = () => {
       </p>
       <Formik
         onSubmit={handleSubmit}
-        initialValues={initialValues}>
+        initialValues={initialValues}
+        validationSchema={validationSchema}>
         {({
           handleSubmit,
           handleChange,
