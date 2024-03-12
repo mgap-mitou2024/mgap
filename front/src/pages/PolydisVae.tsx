@@ -22,7 +22,7 @@ const PolydisVae = () => {
     <AudioContext.Provider value={setAudioSrc}>
       <div>
         <PolydisVaeForm />
-        {audioSrc && <audio src={audioSrc} controls autoPlay />}
+        {audioSrc && <audio src={audioSrc} controls/>}
       </div>
     </AudioContext.Provider>
   );
