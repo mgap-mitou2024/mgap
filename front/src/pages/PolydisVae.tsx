@@ -71,32 +71,6 @@ const PolydisVae = () => {
         論文情報: Wang et al., Learning interpretable representation for
         controllable polyphonic music generation, ISMIR 2020.
       </p>
-      <Typography variant='body1' component='h6' mt={1} gutterBottom>
-        ファイル選択
-      </Typography>
-      <MuiFileInput
-        value={file}
-        onChange={handleChangeFile}
-        variant='outlined'
-      />
-      <br />
-      <Typography variant='caption' component='div' gutterBottom>
-        MP3/MP4/WAV ファイルのみ、ファイルサイズは5MB以内。
-      </Typography>
-      {file &&
-        !(
-          file.type === "audio/mpeg" ||
-          file.type === "video/mp4" ||
-          file.type === "audio/wav"
-        ) && (
-          <Typography
-            variant='caption'
-            component='div'
-            color='error.main'
-            gutterBottom>
-            このファイルタイプはサポートしていません。
-          </Typography>
-        )}
       <Formik
         onSubmit={handleSubmit}
         initialValues={initialValues}>
