@@ -9,24 +9,24 @@ import { MuiFileInput } from "mui-file-input";
 import Typography from "@mui/material/Typography";
 
 interface FormValues {
-  pitchFile: File | null;
-  rhythmFile: File | null;
+  chd: File | null;
+  txt: File | null;
 }
 
 const PolydisVae = () => {
   const { Formik } = formik;
   const schema = yup.object().shape({
-    pitchFile: yup.mixed().required(),
-    rhythmFile: yup.mixed().required(),
+    chd: yup.mixed().required(),
+    txt: yup.mixed().required(),
   });
 
   const handleSubmit = async (values: FormValues, actions: any) => {
-    console.log(typeof values.pitchFile);
+    console.log(typeof values.chd);
 
     try {
       const formData = new FormData();
-      formData.append("pitchFile", values.pitchFile as Blob);
-      formData.append("rhythmFile", values.rhythmFile as Blob);
+      formData.append("chd", values.chd as Blob);
+      formData.append("txt", values.txt as Blob);
 
       console.log(formData, typeof formData);
 
@@ -49,8 +49,8 @@ const PolydisVae = () => {
   };
 
   const initialValues: FormValues = {
-    pitchFile: null,
-    rhythmFile: null,
+    chd: null,
+    txt: null,
   };
 
   const [file, setFile] = useState<File | null>();
@@ -98,12 +98,12 @@ const PolydisVae = () => {
           </Typography>
         )}
       <Formik
-        validationSchema={schema}
         onSubmit={handleSubmit}
         initialValues={initialValues}>
         {({
           handleSubmit,
           handleChange,
+          setFieldValue,
           values,
           errors,
         }: FormikProps<FormValues>) => (
@@ -113,13 +113,15 @@ const PolydisVae = () => {
               <Form.Control
                 type='file'
                 required
-                name='pitchFile'
-                onChange={handleChange}
-                value={values.pitchFile ? values.pitchFile.name : ""}
-                isInvalid={!!errors.pitchFile}
+                name='chd'
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  const files = event.target.files;
+                  if (files) setFieldValue("chd", files[0]);
+                }}
+                isInvalid={!!errors.chd}
               />
               <Form.Control.Feedback type='invalid' tooltip>
-                {errors.pitchFile}
+                {errors.chd}
               </Form.Control.Feedback>
             </Form.Group>
             <Form.Group className='position-relative mb-3'>
@@ -127,13 +129,15 @@ const PolydisVae = () => {
               <Form.Control
                 type='file'
                 required
-                name='rhythmFile'
-                onChange={handleChange}
-                value={values.rhythmFile ? values.rhythmFile.name : ""}
-                isInvalid={!!errors.rhythmFile}
+                name='txt'
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  const files = event.target.files;
+                  if (files) setFieldValue("txt", files[0]);
+                }}
+                isInvalid={!!errors.txt}
               />
               <Form.Control.Feedback type='invalid' tooltip>
-                {errors.rhythmFile}
+                {errors.txt}
               </Form.Control.Feedback>
             </Form.Group>
             <Button type='submit'>曲を作成</Button>
