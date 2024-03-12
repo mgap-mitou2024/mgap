@@ -36,9 +36,11 @@ const PolydisVaeForm = () => {
   });
   const setAudioSrc = useContext(AudioContext);
 
+  const [isPosting, setIsPosting] = useState(false);
+
   const handleSubmit = async (values: FormValues, actions: any) => {
     console.log(typeof values.chd);
-
+    setIsPosting(true);
     try {
       const formData = new FormData();
       formData.append("chd", values.chd as Blob);
@@ -66,6 +68,7 @@ const PolydisVaeForm = () => {
     } catch (error) {
       console.error("Error:", error);
     } finally {
+      setIsPosting(false);
       actions.setSubmitting(false);
     }
   };
@@ -136,7 +139,7 @@ const PolydisVaeForm = () => {
                 {errors.txt}
               </Form.Control.Feedback>
             </Form.Group>
-            <Button type='submit'>曲を作成</Button>
+            <Button type='submit' disabled={isPosting}>{!isPosting ? "曲を作成" : "生成中"}</Button>
           </Form>
         )}
       </Formik>
