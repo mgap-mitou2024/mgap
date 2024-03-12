@@ -7,6 +7,7 @@ import { FormikProps } from "formik";
 import React, { useState, createContext, useContext } from "react";
 import { MuiFileInput } from "mui-file-input";
 import Typography from "@mui/material/Typography";
+import ErrorMsg from "../components/error_msg";
 
 interface FormValues {
   chd: File | null;
@@ -40,6 +41,7 @@ const PolydisVaeForm = () => {
   const setAudioSrc = useContext(AudioContext);
 
   const [isPosting, setIsPosting] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const handleSubmit = async (values: FormValues, actions: any) => {
     console.log(typeof values.chd);
@@ -70,6 +72,7 @@ const PolydisVaeForm = () => {
       setAudioSrc && setAudioSrc(audioUrl);
     } catch (error) {
       console.error("Error:", error);
+      setIsError(true);
     } finally {
       setIsPosting(false);
       actions.setSubmitting(false);
@@ -144,6 +147,7 @@ const PolydisVaeForm = () => {
               </Form.Control.Feedback>
             </Form.Group>
             <Button type='submit' disabled={isPosting}>{!isPosting ? "曲を作成" : "生成中"}</Button>
+            {isError && <ErrorMsg />}
           </Form>
         )}
       </Formik>
